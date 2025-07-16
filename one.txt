@@ -4,3 +4,4 @@ This is third file
 Good bye
 Good bye! hello world
 new file to main
+new file to log
