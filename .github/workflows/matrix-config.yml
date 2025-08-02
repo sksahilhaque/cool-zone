@@ -1,30 +1,34 @@
 name: Matrix Configuration
 
 on: 
-    push:
-    workflow_dispatch:
+  push:
+  workflow_dispatch:
 
 jobs:
-    deploy:
-        strategy:
-          fail-fast: false
-          max-parallel: 2
-          matrix:
-            os: [ubuntu-latest, ubuntu-20.04, windows-latest]
-            images: [hello-world, alpine]
-            exclude:
-              - os: windows-latest
-            include:
-              - images: amd64/alpine
-                os: ubuntu-20.04
-        runs-on: ${{ matrix.os }}
-        steps:
-          - name: Echo docker details
-            if: matrix.os != 'windows-latest'
-            run: docker info
+  deploy:
+    strategy:
+      fail-fast: false
+    #   max-parallel: 2
+      matrix:
+        os: [ubuntu-latest, ubuntu-20.04, windows-latest]
+        images: [hello-world, alpine]
+        exclude:
+          - os: windows-latest  # Exclude Windows as Docker isn't available
+        include:
+          - os: ubuntu-20.04
+            images: amd64/alpine
+    runs-on: ${{ matrix.os }}
 
-          - name: Run image on ${{ matrix.images }}
-            if: matrix.os != 'windows-latest'
-            run: docker run ${{ matrix.images }}
+    steps:
+      - name: Show environment info
+        run: |
+          echo "Running on OS: ${{ matrix.os }}"
+          echo "Using Docker image: ${{ matrix.images }}"
 
-        
+      - name: Check Docker info
+        if: matrix.os != 'windows-latest'
+        run: docker info
+
+      - name: Run Docker image ${{ matrix.images }}
+        if: matrix.os != 'windows-latest'
+        run: docker run ${{ matrix.images }}
